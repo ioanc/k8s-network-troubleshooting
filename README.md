@@ -32,10 +32,17 @@
 
 	Example: podman run -d --privileged --env JFILTER="frame ip tcp udp" localhost/alpine-tshark:009
 
-## filtering log output using jq
+## filtering log output using jq from docker / podman container output
 
 	jq filter where ip addreses and tcp analysis rrt are not null
 
 	Example: podman logs -f 9a199679905cb44 | jq -c '.layers| select (.ip.ip_ip_host != null and .tcp.tcp_tcp_analysis_ack_rtt != null) | [.frame.frame_frame_time, .ip.ip_ip_host, .ip.ip_ip_id, .tcp.tcp_tcp_port, .tcp.tcp_tcp_analysis_ack_rtt, .tcp.tcp_tcp_flags_str]'
+
+## filtering log output using jq from docker / podman container output
+
+	jq filter where ip addreses and tcp analysis rrt are not null
+
+	Example: kubectl logs -f {pod-name} -c tshark | grep "^{" | jq -c '.layers| select (.ip.ip_ip_host != null and .tcp.tcp_tcp_analysis_ack_rtt != null) | [ .frame.frame_frame_time, .ip.ip_ip_host, .ip.ip_ip_id, .tcp.tcp_tcp_port]'
+	
 
 ## TODO: add variable(s) to limit time or number of packet captured
