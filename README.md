@@ -30,7 +30,7 @@
  
 	running the container with --privileged and env variable
 
-	Example: podman run -d --privileged --env JFILTER="ip tcp udp" localhost/alpine-tshark:006
+	Example: podman run -d --privileged --env JFILTER="ip tcp udp" localhost/alpine-tshark:009
 
 ## jq filtering the log output
 
