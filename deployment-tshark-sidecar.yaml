@@ -25,7 +25,7 @@ spec:
         image: a9d593e2/tshark-ek:009
         env: 
         - name: JFILTER
-          value: "ip tcp"
+          value: "frame ip tcp"
         - name: FILTER
           value: "tcp"
         securityContext:
