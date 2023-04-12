@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tshark-sidecar
+  labels:
+    app: tshark-sidecar
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tshark-sidecar
+  template:
+    metadata:
+      name: tshark-sidecar
+      labels:
+        app: tshark-sidecar
+    spec:
+      containers:
+      - name: sqltools
+        image: mcr.microsoft.com/mssql-tools
+        command:
+        - sleep
+        - inf
+      - name: tshark
+        image: a9d593e2/tshark-ek:009
+        env: 
+        - name: JFILTER
+          value: "ip tcp"
+        - name: FILTER
+          value: "tcp"
+        securityContext:
+          capabilities:
+            add:
+              - NET_ADMIN
