@@ -32,7 +32,7 @@
 
 	Example: podman run -d --privileged --env JFILTER="ip tcp udp" localhost/alpine-tshark:009
 
-## jq filtering the log output
+## filtering log output using jq
 
 	jq filter where ip addreses and tcp analysis rrt are not null
 
