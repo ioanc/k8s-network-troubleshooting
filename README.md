@@ -38,7 +38,7 @@
 
 	Example: podman logs -f 9a199679905cb44 | jq -c '.layers| select (.ip.ip_ip_host != null and .tcp.tcp_tcp_analysis_ack_rtt != null) | [.frame.frame_frame_time, .ip.ip_ip_host, .ip.ip_ip_id, .tcp.tcp_tcp_port, .tcp.tcp_tcp_analysis_ack_rtt, .tcp.tcp_tcp_flags_str]'
 
-## filtering log output using jq from docker / podman container output
+## filtering log output using jq from pod container output
 
 	jq filter where ip addreses and tcp analysis rrt are not null
 
