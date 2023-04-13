@@ -1,4 +1,4 @@
-## tshark on alpine:3.17.3 container image for network debugging in kubernetes
+## tshark on alpine container image for network debugging in kubernetes
 
 ### Variables:
 
