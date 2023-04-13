@@ -38,7 +38,7 @@ kubect get pod {pod_with_issue} -o json > pod.json
                 ],
                 "image": "a9d593e2/tshark-ek:009",
                 "imagePullPolicy": "IfNotPresent",
-                "name": "debugger-v9cc9",
+                "name": "debugger-tshark",
                 "resources": {},
                 "securityContext": {
                     "capabilities": {
