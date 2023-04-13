@@ -15,15 +15,13 @@ kubectl logs -f {pod_with_issue} -c {debugger-xxxxx} | grep "^{"| jq -c '.layers
 ```
 
 + On an already running pod, we can do a `kubectl replace raw` and extend the json- output of `kubect get pods` with the next snippet, and add securityContext to an ephemeralContainer
++ The ephemeralContainer image is the one created using the dockerfile
 
 ```bash
 kubect get pod {pod_with_issue} -o json > pod.json
 ```
 
 + Edit the pod.json and add the next string, before dnsPolicy key
-```bash
-vi pod.json
-```
 
 ```json
         "ephemeralContainers": [
@@ -62,7 +60,8 @@ vi pod.json
 kubectl get pod {pod_with_issue} -o json | jq -c > pod.json
 ```
 
-+ Edit the pod.json and add the next string, before dnsPolicy key, using the container file created using dockerfile
++ Edit the pod.json and add the next string, before dnsPolicy key
++ The ephemeralContainer image is the one created using the dockerfile
 
 ```json
 "ephemeralContainers":[{"env":[{"name":"JFILTER","value":"frame ip tcp dns http"},{"name":"FILTER","value":"tcp"}],"image":"a9d593e2/tshark-ek:009","resources":{},"imagePullPolicy":"IfNotPresent","name":"debugger-tshark","securityContext":{"capabilities":{"add":["NET_ADMIN"]}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy": "File"}],
