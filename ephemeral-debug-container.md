@@ -14,7 +14,7 @@ kubectl debug {pod_with_issue} --image alpine:3.17.3 -- sh -c 'apk --update --no
 kubectl logs -f {pod_with_issue} -c {debugger-xxxxx} | grep "^{"| jq -c '.layers|[.frame.frame_frame_time, .http.http_http_response_code, .http.http_http_response_line]'
 ```
 
-+ On an already running pod, we can do a kubectl replace raw and extend the json- output of "kubect get pods" with the next snippet, and add securityContext to an ephemeralContainer
++ On an already running pod, we can do a `kubectl replace raw` and extend the json- output of `kubect get pods` with the next snippet, and add securityContext to an ephemeralContainer
 
 ```bash
 kubect get pod {pod_with_issue} -o json > pod.json
@@ -56,7 +56,7 @@ vi pod.json
         "dnsPolicy": "ClusterFirst",
 ```
 
-+ Another option is to output the kubectl pod -o json in one line with 'jq -c'
++ Another option is to output the kubectl pod -o json in one line with `jq -c`
 
 ```bash
 kubectl get pod {pod_with_issue} -o json | jq -c > pod.json
@@ -68,7 +68,7 @@ kubectl get pod {pod_with_issue} -o json | jq -c > pod.json
 "ephemeralContainers":[{"env":[{"name":"JFILTER","value":"frame ip tcp dns http"},{"name":"FILTER","value":"tcp"}],"image":"a9d593e2/tshark-ek:009","resources":{},"imagePullPolicy":"IfNotPresent","name":"debugger-tshark","securityContext":{"capabilities":{"add":["NET_ADMIN"]}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy": "File"}],
 ```
 
-+ Run kubectl replace --raw using the pod name and the modified pod.json file
++ Run `kubectl replace --raw` using the pod name and the modified pod.json file
 
 ```bash
 kubectl replace --raw /api/v1/namespaces/default/pods/{pod_with_issue}/ephemeralcontainers -f pod.json
