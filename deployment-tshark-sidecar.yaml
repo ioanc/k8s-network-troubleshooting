@@ -22,7 +22,7 @@ spec:
         - sleep
         - inf
       - name: tshark
-        image: a9d593e2/tshark-ek:009
+        image: a9d593e2/tshark-ek:010
         env: 
         - name: JFILTER
           value: "frame ip tcp"
