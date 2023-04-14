@@ -10,5 +10,5 @@ elif [ ! -z "jFILTER" ]
     echo -e $command
     eval $command
 
-    else echo "null" ; exec tshark -i any -l -q -T ek -j $FILTER
+    else echo "null" ; exec tshark -i any -l -q -T ek $FILTER
 fi
