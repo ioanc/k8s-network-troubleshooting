@@ -5,11 +5,12 @@
 
 + Attach ephemeral container to pod_with_issue using mariner:2.0 image.
 + On the fly, install tcpdump and tshark.
-+ tcpdump does not need NET_ADMIN capabilities so it will capure traffic and output to stdout ; man tcpdump
++ tcpdump does not need NET_ADMIN capabilities so it will capure traffic and output to stdout
++ tcpdump will capture only the first 256 bytes of the packet, using the -s 256 parameter; man tcpdump
 + We will analyse it using tshark, that will read from the stdout of tcpdump capturing network traffic on tcp port 80; man tshark
 
 ```bash
-kubectl debug {pod_with_issue} --image mcr.microsoft.com/cbl-mariner/base/core:2.0 -- sh -c 'tdnf install -q -y mariner-repos-extended ; tdnf install -q -y tcpdump wireshark-cli ; tcpdump -U -i eth0 -w - tcp port 80 | tshark -r - -T ek -J "frame ip tcp http"'
+kubectl debug {pod_with_issue} --image mcr.microsoft.com/cbl-mariner/base/core:2.0 -- sh -c 'tdnf install -q -y mariner-repos-extended ; tdnf install -q -y tcpdump wireshark-cli ; tcpdump -U -i eth0 -s 256 -w - tcp port 80 | tshark -r - -T ek -J "frame ip tcp http"'
 ```
 
 + Filter network trace from stdoutput of the ephemeral container using jq
@@ -22,11 +23,12 @@ kubectl logs -f {pod_with_issue} -c {debugger-xxxxx} | grep "^{"| jq -c '.layers
 
 + Attach ephemeral container to pod_with_issue using alpine:3.17.3 image.
 + On the fly, install tcpdump and tshark.
-+ tcpdump does not need NET_ADMIN capabilities so it will capure traffic and output to stdout ; man tcpdump
++ tcpdump does not need NET_ADMIN capabilities so it will capure traffic and output to stdout
++ tcpdump will capture only the first 256 bytes of the packet, using the -s 256 parameter ; man tcpdump
 + We will analyse it using tshark, that will read from the stdout of tcpdump capturing network traffic on tcp port 80; man tshark
 
 ```bash
-kubectl debug {pod_with_issue} --image alpine:3.17.3 -- sh -c 'apk --update --no-cache add tcpdump tshark ; tcpdump -U -i eth0 -w - tcp port 80 | tshark -r - -T ek -J "frame ip tcp http"'
+kubectl debug {pod_with_issue} --image alpine:3.17.3 -- sh -c 'apk --update --no-cache add tcpdump tshark ; tcpdump -U -i eth0 -s 256 -w - tcp port 80 | tshark -r - -T ek -J "frame ip tcp http"'
 ```
 
 + Filter network trace from stdoutput of the ephemeral container using jq
