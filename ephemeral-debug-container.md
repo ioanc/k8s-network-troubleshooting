@@ -12,7 +12,7 @@
 kubectl debug {pod_with_issue} --image mcr.microsoft.com/cbl-mariner/base/core:2.0 -- sh -c 'tdnf install -q -y mariner-repos-extended ; tdnf install -q -y tcpdump wireshark-cli ; tcpdump -U -i eth0 -w - tcp port 80 | tshark -r - -T ek -J "frame ip tcp http"'
 ```
 
-+ Filter network trace from stdoutput of the ephemeral container using JQ
++ Filter network trace from stdoutput of the ephemeral container using jq
 
 ```bash
 kubectl logs -f {pod_with_issue} -c {debugger-xxxxx} | grep "^{"| jq -c '.layers|[.frame.frame_frame_time, .http.http_http_response_code, .http.http_http_response_line]'
@@ -29,7 +29,7 @@ kubectl logs -f {pod_with_issue} -c {debugger-xxxxx} | grep "^{"| jq -c '.layers
 kubectl debug {pod_with_issue} --image alpine:3.17.3 -- sh -c 'apk --update --no-cache add tcpdump tshark ; tcpdump -U -i eth0 -w - tcp port 80 | tshark -r - -T ek -J "frame ip tcp http"'
 ```
 
-+ Filter network trace from stdoutput of the ephemeral container using JQ
++ Filter network trace from stdoutput of the ephemeral container using jq
 
 ```bash
 kubectl logs -f {pod_with_issue} -c {debugger-xxxxx} | grep "^{"| jq -c '.layers|[.frame.frame_frame_time, .http.http_http_response_code, .http.http_http_response_line]'
