@@ -1,7 +1,7 @@
 
 + Attach ephemeral container to pod_with_issue using alpine image
 + On the fly, install tcpdump and tshark
-+ tcpdump does not need NET_ADMIN capabilities so it will capure traffic and output to stdout ; man tspdump
++ tcpdump does not need NET_ADMIN capabilities so it will capure traffic and output to stdout ; man tcpdump
 + We will analyze it using tshark, that will read from the stdout of tcpdump ; man tshark
 
 ```bash
