@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/cbl-mariner/base/core:2.0
-LABEL Author: ioan corcodel
-LABEL Purpose: set quickack using initContainer on default route
+LABEL "Author"="ioan corcodel"
+LABEL "Purpose"="set quickack using initContainer on default route"
 # :002 install iproute and configrue '/usr/sbin/ip' to be executed by none-root user
 RUN tdnf install -y iproute ; chmod u+s /usr/sbin/ip
 # :003 set quickack on default route
