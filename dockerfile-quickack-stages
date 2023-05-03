@@ -1,8 +1,10 @@
+# docker build --target iproute -t a9d593e2/mariner2.0-iproute:001 --file dockerfile-quickack-stages .
 FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS iproute
 LABEL org.opencontainers.image.authors="ioan corcodel"
 LABEL "Purpose"="set quickack using initContainer on default route"
 RUN tdnf install -y iproute
 
+# docker build --target quickack -t a9d593e2/mariner2.0-setquickack:001 --file dockerfile-quickack-stages .
 FROM iproute AS quickack
 RUN chmod u+s /usr/sbin/ip
 CMD ["/bin/sh", "-c", "ip route change `ip route | grep default | sed 's/.*/&quickack 1/g'` ; ip route show"]
