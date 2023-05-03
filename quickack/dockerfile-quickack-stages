@@ -6,5 +6,6 @@ RUN tdnf install -y iproute
 # docker build --target quickack -t a9d593e2/mariner2.0-setquickack:001 --file dockerfile-quickack-stages .
 FROM iproute AS quickack
 LABEL "Purpose"="set quickack using initContainer on default route"
+# configure /usr/sbin/ip with setuid , so the ip command can be run with none-root user
 RUN chmod u+s /usr/sbin/ip
 CMD ["/bin/sh", "-c", "ip route change `ip route | grep default | sed 's/.*/&quickack 1/g'` ; ip route show"]
