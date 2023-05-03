@@ -14,7 +14,7 @@ spec:
     spec:
       initContainers:
       - name: init-setquickack
-        image: docker.io/a9d593e2/mariner2.0-quickack:003
+        image: docker.io/a9d593e2/mariner2.0-setquickack:001
         imagePullPolicy: IfNotPresent
         resources:
           limits:
@@ -28,7 +28,7 @@ spec:
             add:
             - NET_ADMIN
       containers:
-      - image: mcr.microsoft.com/cbl-mariner/base/core:2.0
+      - image: docker.io/a9d593e2/mariner2.0-iproute:001
         name: application
         securityContext:
           readOnlyRootFilesystem: true
