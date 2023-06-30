@@ -13,4 +13,7 @@ The tcpserver-no-keepalive application needs 3 parameters
   
       ./tcpserver-no-keepalive 192.168.1.5 12345 60
 
+![190412_44287](https://github.com/ioanc/k8s-network-troubleshooting/assets/16124079/f668577c-6913-4084-9ef5-727fc94b448b)
+
+
 Used https://www.linode.com/docs/guides/developing-udp-and-tcp-clients-and-servers-in-go/ as source of inspiration
