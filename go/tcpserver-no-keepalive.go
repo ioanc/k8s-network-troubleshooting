@@ -13,7 +13,7 @@ import (
 func main() {
         arguments := os.Args
         if len(arguments) == 1 {
-                fmt.Println("Please provide 'address port'")
+                fmt.Println("Please provide 'address port delay'")
                 return
         }
 
