@@ -7,7 +7,7 @@ The tcpclient-no-keepalive need one paramater:
       ./tcpclient-no-keepalive 192.168.1.5:12345
 
 The tcpserver-no-keepalive application needs 3 parameters
-- IPv4 address to bind to on the Linux system
+- IPv4 address to bind to ; can be used also 0.0.0.0
 - TCP port listenening on
 - timout in seconds, after it will send the actual data requested by the client
   
