@@ -58,7 +58,6 @@ func main() {
 			fmt.Println(err)
 			return
 		}
-		//}
 		fmt.Println((time.Now()).Format(time.RFC3339 + "\n"))
 
 		time.Sleep((time.Duration(i) * time.Second))

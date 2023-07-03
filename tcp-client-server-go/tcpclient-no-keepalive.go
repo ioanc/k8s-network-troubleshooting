@@ -36,7 +36,6 @@ func main() {
 
 	for {
 		reader := bufio.NewReader(os.Stdin)
-		//reader := bufio.NewReader(os.Stdin)
 		fmt.Print(">> ")
 		text, _ := reader.ReadString('\n')
 		fmt.Fprintf(c, text+"\n")
