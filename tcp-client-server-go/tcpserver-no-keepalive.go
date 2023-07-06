@@ -36,10 +36,22 @@ func main() {
 		return
 	}
 	// Enable / Disable Keepalives
-	err = c.SetKeepAlive(false)
+	SetKeepAlive, err := strconv.ParseBool(arguments[4])
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	err = c.SetKeepAlive(SetKeepAlive)
 	if err != nil {
 		fmt.Printf("Unable to set keepalive - %s", err)
 	}
+	if SetKeepAlive {
+		err = c.SetKeepAlivePeriod(60 * time.Second)
+		if err != nil {
+			fmt.Printf("Unable to set keepalivePeriod - %s", err)
+		}
+	}
+
 	for {
 		netData, err := bufio.NewReader(c).ReadString('\n')
 		if err != nil {

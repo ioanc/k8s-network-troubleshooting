@@ -2,3 +2,5 @@ test-time-debug.json
 test-time-debug.yaml
 test-time.json
 test-time.yaml
+tcp-client-server-go/tcpserver-no-keepalive
+tcp-client-server-go/tcpclient-no-keepalive
