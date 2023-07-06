@@ -8,14 +8,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	//"flag"
 )
 
 func server(address string, port string, KeepAlive string, idle string) {
-	// arguments := os.Args
-	// if len(arguments) == 1 {
-	// 	fmt.Println("Please provide 'address port delay'")
-	// 	return
-	// }
 
 	// Resolve TCP Address
 	addrport := address + ":" + port
@@ -123,17 +119,16 @@ func main() {
 
 	arguments := os.Args
 	if len(arguments) == 1 {
-		fmt.Println("Please provide option: server ot client")
+		fmt.Println("Please provide option: server or client")
 		return
-	}
-
-	// call server function
-	option := arguments[1]
-	if option == "server" {
-		server(arguments[2], arguments[3], arguments[4], arguments[5])
-	} else if option == "client" {
-		client(arguments[2])
 	} else {
-		fmt.Println("please use server or client")
+		option := arguments[1]
+		if option == "server" {
+			server(arguments[2], arguments[3], arguments[4], arguments[5])
+		} else if option == "client" {
+			client(arguments[2])
+		} else {
+			fmt.Println("please use server or client")
+		}
 	}
 }
