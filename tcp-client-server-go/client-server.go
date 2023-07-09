@@ -2,16 +2,15 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"net"
 	"os"
-	"strconv"
 	"strings"
 	"time"
-	//"flag"
 )
 
-func server(address string, port string, KeepAlive string, idle string) {
+func server(address string, port string, KeepAlive bool, idle time.Duration) {
 
 	// Resolve TCP Address
 	addrport := address + ":" + port
@@ -32,17 +31,13 @@ func server(address string, port string, KeepAlive string, idle string) {
 		return
 	}
 	// Enable / Disable Keepalives
-	SetKeepAlive, err := strconv.ParseBool(KeepAlive)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	err = c.SetKeepAlive(SetKeepAlive)
+
+	err = c.SetKeepAlive(KeepAlive)
 	if err != nil {
 		fmt.Printf("Unable to set keepalive - %s", err)
 	}
-	if SetKeepAlive {
-		err = c.SetKeepAlivePeriod(60 * time.Second)
+	if KeepAlive {
+		err = c.SetKeepAlivePeriod(25 * time.Second)
 		if err != nil {
 			fmt.Printf("Unable to set keepalivePeriod - %s", err)
 		}
@@ -61,14 +56,16 @@ func server(address string, port string, KeepAlive string, idle string) {
 		}
 		fmt.Print("-> ", string(netData))
 
-		i, err := strconv.Atoi(idle)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+		// i, err := strconv.Atoi(idle)
+		// if err != nil {
+		// 	fmt.Println(err)
+		// 	return
+		// }
+
 		fmt.Println((time.Now()).Format(time.RFC3339 + "\n"))
 
-		time.Sleep((time.Duration(i) * time.Second))
+		// time.Sleep((time.Duration(i) * time.Second))
+		time.Sleep(idle)
 
 		fmt.Print("-> replay", "\n")
 		fmt.Println((time.Now()).Format(time.RFC3339 + "\n"))
@@ -79,11 +76,11 @@ func server(address string, port string, KeepAlive string, idle string) {
 	}
 }
 
-func client(addressport string) {
+func client(address string, port string) {
 
 	// Resolve TCP Address
-	CONNECT := addressport
-	addr, err := net.ResolveTCPAddr("tcp", CONNECT)
+	addrport := address + ":" + port
+	addr, err := net.ResolveTCPAddr("tcp", addrport)
 	if err != nil {
 		fmt.Printf("Unable to resolve IP")
 	}
@@ -94,11 +91,11 @@ func client(addressport string) {
 		return
 	}
 
-	// Enable Keepalives
-	err = c.SetKeepAlive(false)
-	if err != nil {
-		fmt.Printf("Unable to set keepalive - %s", err)
-	}
+	// Keepalives controlled on server side
+	// err = c.SetKeepAlive(false)
+	// if err != nil {
+	// 	fmt.Printf("Unable to set keepalive - %s", err)
+	// }
 
 	for {
 		reader := bufio.NewReader(os.Stdin)
@@ -115,20 +112,63 @@ func client(addressport string) {
 	}
 }
 
+var serverKeepAlive *bool
+var serverIpCmd *string
+var serverPortCmd *string
+var serverIdleCmd *time.Duration
+
+var remoteIpCmd *string
+var remotePortCmd *string
+
 func main() {
 
-	arguments := os.Args
-	if len(arguments) == 1 {
-		fmt.Println("Please provide option: server or client")
-		return
-	} else {
-		option := arguments[1]
-		if option == "server" {
-			server(arguments[2], arguments[3], arguments[4], arguments[5])
-		} else if option == "client" {
-			client(arguments[2])
+	serverCmd := flag.NewFlagSet("server", flag.ExitOnError)
+	serverKeepAlive := serverCmd.Bool("keepalive", false, "keepAlive")
+	serverIpCmd := serverCmd.String("ip", "0.0.0.0", "listening ip address")
+	serverPortCmd := serverCmd.String("port", "12345", "listening server port")
+	serverIdleCmd := serverCmd.Duration("idle", 30*time.Second, "idle time duration in seconds")
+
+	clientCmd := flag.NewFlagSet("client", flag.ExitOnError)
+	remoteIpCmd := clientCmd.String("ip", "", "remote ip address")
+	remotePortCmd := clientCmd.String("port", "12345", "remote port port")
+
+	if len(os.Args) < 2 {
+		fmt.Println("Expect 'client' or 'server'")
+		os.Exit(1)
+	}
+
+	switch os.Args[1] {
+
+	case "server":
+		serverCmd.Parse(os.Args[2:])
+		fmt.Println("Running as server:")
+		fmt.Println("  keepalive", *serverKeepAlive)
+		fmt.Println("  IP address:", *serverIpCmd)
+		fmt.Println("  Port:", *serverPortCmd)
+		fmt.Println("  Idle:", *serverIdleCmd)
+
+		server(*serverIpCmd, *serverPortCmd, *serverKeepAlive, *serverIdleCmd)
+
+	case "client":
+		clientCmd.Parse(os.Args[2:])
+
+		if *remoteIpCmd == "" {
+			fmt.Println("Running as client:")
+			fmt.Println("  -IP remote address missing")
+			fmt.Println("  Remote Port:", *remotePortCmd)
+			return
+
 		} else {
-			fmt.Println("please use server or client")
+			fmt.Println("Running as client:")
+			fmt.Println("  Remote IP:", *remoteIpCmd)
+			fmt.Println("  Remote Port:", *remotePortCmd)
+
+			client(*remoteIpCmd, *remotePortCmd)
 		}
+
+	default:
+		fmt.Println("expected 'client' or 'server' subcommands")
+		os.Exit(1)
+
 	}
 }
