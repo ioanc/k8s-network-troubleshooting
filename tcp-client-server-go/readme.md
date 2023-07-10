@@ -24,5 +24,7 @@ The need of this application came when troubleshooting a network connection issu
             remote port port (default "12345")
 
 
+![180044_57900](https://github.com/ioanc/k8s-network-troubleshooting/assets/16124079/a50fbc8f-1616-422a-8898-5aa92d34b13e)
+
 
 Used https://www.linode.com/docs/guides/developing-udp-and-tcp-clients-and-servers-in-go/ as source of inspiration
