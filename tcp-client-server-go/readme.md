@@ -1,5 +1,5 @@
-Small test go application, that can be started a cliet or server.
-The need of this application came when troubleshooting a network connection issue between 2 application not ussing tcp keepalive
+Small test application, written in go, that can be started as client or server and communicate between each other.
+The need of this application came when troubleshooting a network connection issue between 2 applications not using TCP keepalive.
 
 + Start application as server, with default values
 
