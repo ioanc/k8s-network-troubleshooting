@@ -1,0 +1,73 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  labels:
+    addonmanager.kubernetes.io/mode: EnsureExists
+    kubernetes.io/cluster-service: "true"
+  name: azurefile-retain
+mountOptions:
+- mfsymlinks
+- actimeo=30
+- nosharesock
+parameters:
+  skuName: Standard_LRS
+provisioner: file.csi.azure.com
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-tcpdump
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: azurefile-retain
+  resources:
+    requests:
+      storage: 128Gi
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: tcpdump
+  name: tcpdump
+spec:
+  selector:
+    matchLabels:
+      app: tcpdump
+  template:
+    metadata:
+      labels:
+        app: tcpdump
+    spec:
+      containers:
+      - image: mcr.microsoft.com/cbl-mariner/base/core:2.0
+        env:
+        - name: CLIENT
+          value: "1.2.3.4"     
+        command:
+        - sh
+        - -c
+        - tdnf install -q -y tcpdump ; mkdir /tcpdump ; tcpdump -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-%M.pcap host $CLIENT
+        name: tcpdump
+        volumeMounts:
+          - mountPath: /root/tcpdump
+            name: tcpdump
+            readOnly: false
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        securityContext:
+          privileged: true
+      hostPID: true
+      hostNetwork: true
+      volumes:
+      - name: tcpdump
+        persistentVolumeClaim:
+          claimName: pvc-tcpdump
