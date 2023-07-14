@@ -123,7 +123,7 @@ var remotePortCmd *string
 func main() {
 
 	serverCmd := flag.NewFlagSet("server", flag.ExitOnError)
-	serverKeepAlive := serverCmd.Bool("keepalive", false, "keepAlive")
+	serverKeepAlive := serverCmd.Bool("keepalive", true, "keepAlive")
 	serverIpCmd := serverCmd.String("ip", "0.0.0.0", "listening ip address")
 	serverPortCmd := serverCmd.String("port", "12345", "listening server port")
 	serverIdleCmd := serverCmd.Duration("idle", 30*time.Second, "idle time duration in seconds")
