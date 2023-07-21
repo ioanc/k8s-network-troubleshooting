@@ -1,0 +1,92 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  labels:
+    addonmanager.kubernetes.io/mode: EnsureExists
+    kubernetes.io/cluster-service: "true"
+  name: azurefile-retain
+mountOptions:
+- mfsymlinks
+- actimeo=30
+- nosharesock
+parameters:
+  skuName: Standard_LRS
+provisioner: file.csi.azure.com
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: kube-system
+  name: pvc-iptable-trace
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: azurefile-retain
+  resources:
+    requests:
+      storage: 128Gi
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  namespace: kube-system
+  labels:
+    app: iptable-trace
+  name: iptable-trace
+spec:
+  selector:
+    matchLabels:
+      app: iptable-trace
+  template:
+    metadata:
+      labels:
+        app: iptable-trace
+    spec:
+      containers:
+      - image: docker.io/alpine:3.18.2
+      # - image: mcr.microsoft.com/cbl-mariner/base/core:2.0
+        env:
+        - name: CLIENT
+          value: "80.57.32.148" 
+        command:
+        - /bin/sh
+        - -xc
+        - nsenter --mount=/proc/1/ns/mnt -- bash -xc "modprobe nf_log_ipv4 ; sysctl -w net.netfilter.nf_log.2=nf_log_ipv4 ; iptables -t raw -A PREROUTING -s $CLIENT -p tcp --syn -j TRACE ; iptables -t raw -A OUTPUT -s $CLIENT -p tcp --syn -j TRACE" ; tail -f /root/node-log/kern.log > /root/iptable-trace/$HOSTNAME-$(date --utc +"%FT%H%M%S").log 
+        # - tdnf -q install util-linux procps -y; nsenter --mount=/proc/1/ns/mnt -- bash -xc "modprobe nf_log_ipv4 ; sysctl -w net.netfilter.nf_log.2=nf_log_ipv4 ; iptables -t raw -A PREROUTING -s $CLIENT -p tcp --syn -j TRACE ; iptables -t raw -A OUTPUT -s $CLIENT -p tcp --syn -j TRACE"; tail -f /root/node-log/kern.log > /root/iptable-trace/$HOSTNAME-$(date --utc +"%FT%H%M%S").log
+        name: trace-iptable
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -xc
+              - nsenter --mount=/proc/1/ns/mnt -- bash -xc "sysctl -w net.netfilter.nf_log.2=NONE ; iptables -t raw -D PREROUTING -s $CLIENT -p tcp --syn -j TRACE ; iptables -t raw -D OUTPUT -s $CLIENT -p tcp --syn -j TRACE"
+        volumeMounts:
+          - mountPath: /root/iptable-trace
+            name: iptable-trace
+            readOnly: false
+          - mountPath: /root/node-log
+            name: iptable-trace-kernel
+            readOnly: true
+        resources:
+          limits:
+            cpu: 100m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        securityContext:
+          privileged: true
+      hostPID: true
+      hostNetwork: true
+      volumes:
+      - name: iptable-trace
+        persistentVolumeClaim:
+          claimName: pvc-iptable-trace
+      - name: iptable-trace-kernel
+        hostPath:
+          path: /var/log/
+          type: Directory
+
