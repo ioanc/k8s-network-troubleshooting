@@ -43,23 +43,32 @@ spec:
         app: tcpdump
     spec:
       containers:
-      - image: mcr.microsoft.com/cbl-mariner/base/core:2.0
+      # - image: mcr.microsoft.com/cbl-mariner/base/core:2.0
+      - image: docker.io/alpine:3.18.2
         env:
         - name: CLIENT
-          value: "1.2.3.4"     
+          value: "1.1.1.1"     
         command:
         - sh
-        - -c
-        - tdnf install -q -y tcpdump ; mkdir /tcpdump ; tcpdump -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-%M.pcap host $CLIENT
+        - -xc
+        # - tdnf install -q -y tcpdump ; mkdir /tcpdump ; tcpdump -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-%M.pcap 'tcp[tcpflags] & (tcp-syn) == (tcp-syn)' and host $CLIENT
+        - apk --update add tcpdump ; mkdir /tcpdump ; tcpdump -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-$CLIENT-%M.pcap 'tcp[tcpflags] & (tcp-syn) == (tcp-syn)' # and host $CLIENT
         name: tcpdump
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -xc
+              - sleep 10
         volumeMounts:
           - mountPath: /root/tcpdump
             name: tcpdump
             readOnly: false
         resources:
           limits:
-            cpu: 200m
-            memory: 256Mi
+            cpu: 100m
+            memory: 512Mi
           requests:
             cpu: 100m
             memory: 128Mi
