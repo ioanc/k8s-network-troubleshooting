@@ -1,6 +1,6 @@
 Configure ssh port to 321654
 VM_RG = "VM-RESOURCE-GRUP"
 VM_NAME = "VM-NAME"
-  
+SSH_PORT = "321654"  
 az vm run-command invoke -n $VM_NAME -g $VM_RG --command-id RunShellScrip \
---scripts "sudo sed -i 's/^AuthorizedKeysCommandUser root/\nMatch all\nPort 321654/g' /etc/ssh/sshd_config; sshd -t && systemctl restart ssh ; sudo systemctl status ssh.service" -o json | jq | awk '{gsub(/\\n/,"\n")}1'
+--scripts "sudo sed -i 's/^AuthorizedKeysCommandUser root/\nMatch all\nPort $SSH_PORT/g' /etc/ssh/sshd_config; sshd -t && systemctl restart ssh ; sudo systemctl status ssh.service" -o json | jq | awk '{gsub(/\\n/,"\n")}1'
