@@ -1,3 +1,6 @@
+# DaemonSet to capure network trace, using tcpdump, on all AKS cluster nodes.
+# tcpdump is configured to capture only SYN and SYN-ACK packets 
+# the pcap file name will containe the name of the node and the IP address of the client that is connecting to the application running on AKS
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
