@@ -1,6 +1,10 @@
 # DaemonSet to capure network trace, using tcpdump, on all AKS cluster nodes.
-# tcpdump is configured to capture only SYN and SYN-ACK packets 
-# the pcap file name will containe the name of the node and the IP address of the client that is connecting to the application running on AKS
+# the yaml file will create 3 resources:
+#   1) a new storage class, using the file.csi.azure.com provisioner with reclaimPolicy: Retain
+#   2) a PVC, using the above storage class
+#   3) a DaemonSet to capure network trace, using tcpdump, on all AKS cluster nodes.
+#      tcpdump is configured to capture only SYN and SYN-ACK packets 
+#      the pcap file name will containe the name of the node and the IP address of the client that is connecting to the application running on AKS over a load Balancer service
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
