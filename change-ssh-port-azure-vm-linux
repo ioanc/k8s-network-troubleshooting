@@ -1,4 +1,4 @@
-Configure ssh port to 321654
+Configure ssh port to 21654
 VM_RG = "VM-RESOURCE-GRUP"
 VM_NAME = "VM-NAME"
 SSH_PORT = "21654"  
