@@ -1,6 +1,5 @@
 Configure ssh port to 21654
 VM_RG="VM-RESOURCE-GRUP"
 VM_NAME="VM-NAME"
-SSH_PORT="22222"  
-az vm run-command invoke -n $VM_NAME -g $VM_RG --command-id RunShellScrip \
---scripts "echo "port $SSH_PORT" >> /etc/ssh/sshd_config.d/40-ssh-port.conf ; echo "port 22" >> /etc/ssh/sshd_config.d/40-ssh-port.conf; sshd -t && systemctl restart ssh ; sudo systemctl status ssh.service" -o json | jq | awk '{gsub(/\\n/,"\n")}'
+SSH_PORT="22222"
+az vm run-command invoke --name $VM_NAME --resource-group $VM_RG --command-id RunShellScript --scripts "echo "port $SSH_PORT" > /etc/ssh/sshd_config.d/40-ssh-port.conf ; echo "port 22" >> /etc/ssh/sshd_config.d/40-ssh-port.conf; sshd -t && systemctl restart ssh ; sudo systemctl status ssh.service" -o json | jq | awk '{gsub(/\\n/,"\n")}'
