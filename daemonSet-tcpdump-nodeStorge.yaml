@@ -58,7 +58,7 @@ spec:
           privileged: true
       hostPID: true
       hostNetwork: true
-      Volumes:
+      volumes:
       - hostPath:
           path: /
           type: ""
