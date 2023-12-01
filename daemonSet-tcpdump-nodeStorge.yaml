@@ -25,16 +25,16 @@ spec:
         app: tcpdump
     spec:
       containers:
-      # - image: mcr.microsoft.com/cbl-mariner/base/core:2.0
-      - image: docker.io/alpine:3.18.2
+      - image: mcr.microsoft.com/cbl-mariner/base/core:2.0
+      # - image: docker.io/alpine:3.18.2
         env:
         - name: CLIENT
           value: "1.1.1.1"     
         command:
         - sh
         - -xc
-        # - tdnf install -q -y tcpdump ; mkdir /tcpdump ; tcpdump -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-%M.pcap 'tcp[13] == 18 or tcp[13] == 17 or tcp[13] == 2 or tcp[13] == 4 or tcp[13] == 20'
-        - apk --update add tcpdump ; tcpdump -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-$CLIENT-%M.pcap 'tcp[13] == 18 or tcp[13] == 17 or tcp[13] == 2 or tcp[13] == 4 or tcp[13] == 20'
+        - tdnf install -q -y tcpdump ; mkdir /tcpdump ; tcpdump -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-%M.pcap 'tcp[13] == 18 or tcp[13] == 17 or tcp[13] == 2 or tcp[13] == 4 or tcp[13] == 20'
+        # - apk --update add tcpdump ; tcpdump -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-$CLIENT-%M.pcap 'tcp[13] == 18 or tcp[13] == 17 or tcp[13] == 2 or tcp[13] == 4 or tcp[13] == 20'
         name: tcpdump
         lifecycle:
           preStop:
