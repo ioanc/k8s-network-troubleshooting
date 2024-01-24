@@ -1,13 +1,14 @@
 #
 # DaemonSet to capure network trace, using tcpdump, on all AKS cluster nodes.
 # the yaml file will create 3 resources:
-#   1) a DaemonSet to capure network trace, using tcpdump, on all AKS cluster nodes and write files to local node
-#   2) the tcpdump filter will record specific packages - https://www.howtouselinux.com/post/tcpdump-capture-packets-with-tcp-flags
+#   1) a DaemonSet to capure network trace, using tcpdump, on all AKS cluster nodes and write files to local node disk
+#   2) the tcpdump filter will record packet to and from SRV and specific packages - https://www.howtouselinux.com/post/tcpdump-capture-packets-with-tcp-flags
 #       SYN: tcp[13] == 2
 #       RST: tcp[13] == 4
 #       SYN, ACK: tcp[13] == 18
 #       FIN, ACK: tcp[13] == 17
 #       RST,ACK: tcp[13] == 20
+#   3) we can use "tar -vczf tcpdump.tgz /*.pcap" in a debug node pod to archive and compress all *.pcap files in one, at the node level, and then copy it for analysis.
 
 apiVersion: apps/v1
 kind: DaemonSet
@@ -15,6 +16,7 @@ metadata:
   labels:
     app: tcpdump
   name: tcpdump
+  namespace: kube-system
 spec:
   selector:
     matchLabels:
@@ -28,13 +30,13 @@ spec:
       - image: mcr.microsoft.com/cbl-mariner/base/core:2.0
       # - image: docker.io/alpine:3.18.2
         env:
-        - name: CLIENT
-          value: "1.1.1.1"     
+        - name: SRV
+          value: "10.65.15.253"     
         command:
         - sh
         - -xc
-        - tdnf install -q -y tcpdump ; mkdir /tcpdump ; tcpdump -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-%M.pcap 'tcp[13] == 18 or tcp[13] == 17 or tcp[13] == 2 or tcp[13] == 4 or tcp[13] == 20'
-        # - apk --update add tcpdump ; tcpdump -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-$CLIENT-%M.pcap 'tcp[13] == 18 or tcp[13] == 17 or tcp[13] == 2 or tcp[13] == 4 or tcp[13] == 20'
+        - tdnf install -y tcpdump ; tcpdump -Z root -e -ni any -s 128 -G 300 -w /tcpdump/$HOSTNAME-$SRV-%M.pcap tcp[13] == 18 or tcp[13] == 17 or tcp[13] == 2 or tcp[13] == 4 or tcp[13] == 20 and host $SRV
+        # - apk --update add tcpdump ; tcpdump -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-$SRV-%M.pcap 'tcp[13] == 18 or tcp[13] == 17 or tcp[13] == 2 or tcp[13] == 4 or tcp[13] == 20'
         name: tcpdump
         lifecycle:
           preStop:
@@ -44,7 +46,7 @@ spec:
               - -xc
               - sleep 10
         volumeMounts:
-        - mountPath: /root/tcpdump
+        - mountPath: /tcpdump
           name: host-root
           readOnly: false
         resources:
