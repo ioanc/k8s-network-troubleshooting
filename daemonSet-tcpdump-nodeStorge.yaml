@@ -36,7 +36,7 @@ spec:
         - sh
         - -xc
         - tdnf install -y tcpdump ; tcpdump -Z root -e -ni any -s 128 -G 300 -w /tcpdump/$HOSTNAME-$SRV-%M.pcap tcp[13] == 18 or tcp[13] == 17 or tcp[13] == 2 or tcp[13] == 4 or tcp[13] == 20 and host $SRV
-        # - apk --update add tcpdump ; tcpdump -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-$SRV-%M.pcap 'tcp[13] == 18 or tcp[13] == 17 or tcp[13] == 2 or tcp[13] == 4 or tcp[13] == 20'
+        # - apk --update add tcpdump ; tcpdump -Z root -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-$SRV-%M.pcap 'tcp[13] == 18 or tcp[13] == 17 or tcp[13] == 2 or tcp[13] == 4 or tcp[13] == 20'
         name: tcpdump
         lifecycle:
           preStop:
