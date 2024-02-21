@@ -1,14 +1,14 @@
 #
-# DaemonSet to capure network trace, using tcpdump, on all AKS cluster nodes.
-# the yaml file will create 3 resources:
-#   1) a DaemonSet to capure network trace, using tcpdump, on all AKS cluster nodes and write files to local node disk
-#   2) the tcpdump filter will record packet to and from SRV and specific packages - https://www.howtouselinux.com/post/tcpdump-capture-packets-with-tcp-flags
-#       SYN: tcp[13] == 2
-#       RST: tcp[13] == 4
-#       SYN, ACK: tcp[13] == 18
-#       FIN, ACK: tcp[13] == 17
-#       RST,ACK: tcp[13] == 20
-#   3) we can use "tar -vczf tcpdump.tgz /*.pcap" in a debug node pod to archive and compress all *.pcap files in one, at the node level, and then copy it for analysis.
+# The DaemonSet to capure network trace, using tcpdump, on all AKS cluster nodes and write files to local node disk
+# tcpdump filter will record packet to and from SRV and specific packages - https://www.howtouselinux.com/post/tcpdump-capture-packets-with-tcp-flags
+#   SYN: tcp[13] == 2
+#   RST: tcp[13] == 4
+#   SYN, ACK: tcp[13] == 18
+#   FIN, ACK: tcp[13] == 17
+#   RST,ACK: tcp[13] == 20
+# tcpdump will create a file every 5 minutes and after 60 minutes overwrite the first one; 
+#    this approach will ensure we will keep history for 60min, without filling up node disk
+# We can use "tar -vczf tcpdump-$HOSTNAME.tgz /*.pcap" in a debug node pod to archive and compress all *.pcap files.
 
 apiVersion: apps/v1
 kind: DaemonSet
