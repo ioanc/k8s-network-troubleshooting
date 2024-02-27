@@ -1,0 +1,89 @@
+#
+# DaemonSet to capure network trace, using tcpdump, on all AKS cluster nodes.
+# the yaml file will create 3 resources:
+#   1) a new storage class, using the file.csi.azure.com provisioner with reclaimPolicy: Retain
+#   2) a PVC, using the above storage class
+#   3) a DaemonSet to capure network trace, using tcpdump filtered on the IP address configured using the CLIENT variable, on all AKS cluster nodes.
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  labels:
+    addonmanager.kubernetes.io/mode: EnsureExists
+    kubernetes.io/cluster-service: "true"
+  name: azurefile-retain
+mountOptions:
+- mfsymlinks
+- actimeo=30
+- nosharesock
+parameters:
+  skuName: Standard_LRS
+provisioner: file.csi.azure.com
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-tcpdump
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: azurefile-retain
+  resources:
+    requests:
+      storage: 128Gi
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: tcpdump
+  name: tcpdump
+spec:
+  selector:
+    matchLabels:
+      app: tcpdump
+  template:
+    metadata:
+      labels:
+        app: tcpdump
+    spec:
+      containers:
+      - image: mcr.microsoft.com/cbl-mariner/base/core:2.0
+      # - image: docker.io/alpine:3.18.2
+        env:
+        - name: CLIENT
+          value: "172.212.27.129"     
+        command:
+        - sh
+        - -xc
+        - date --utc ; tdnf install -q -y tcpdump ; mkdir /tcpdump ; date --utc ; tcpdump -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-%M.pcap host $CLIENT
+        # - apk --update add tcpdump ; mkdir /tcpdump ; tcpdump -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-$CLIENT-%M.pcap host $CLIENT
+        name: tcpdump
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -xc
+              - sleep 10
+        volumeMounts:
+          - mountPath: /root/tcpdump
+            name: tcpdump
+            readOnly: false
+        resources:
+          limits:
+            cpu: 100m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        securityContext:
+          privileged: true
+      hostPID: true
+      hostNetwork: true
+      volumes:
+      - name: tcpdump
+        persistentVolumeClaim:
+          claimName: pvc-tcpdump
