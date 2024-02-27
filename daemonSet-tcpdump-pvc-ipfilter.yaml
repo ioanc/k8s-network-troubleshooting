@@ -54,7 +54,7 @@ spec:
       # - image: docker.io/alpine:3.18.2
         env:
         - name: CLIENT
-          value: "172.212.27.129"     
+          value: "1.2.3.4"     
         command:
         - sh
         - -xc
