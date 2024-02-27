@@ -3,13 +3,7 @@
 # the yaml file will create 3 resources:
 #   1) a new storage class, using the file.csi.azure.com provisioner with reclaimPolicy: Retain
 #   2) a PVC, using the above storage class
-#   3) a DaemonSet to capure network trace, using tcpdump, on all AKS cluster nodes.
-#   4) the tcpdump filter will record specific packages - https://www.howtouselinux.com/post/tcpdump-capture-packets-with-tcp-flags
-#       SYN: tcp[13] == 2
-#       RST: tcp[13] == 4
-#       SYN, ACK: tcp[13] == 18
-#       FIN, ACK: tcp[13] == 17
-#       RST,ACK: tcp[13] == 20
+#   3) a DaemonSet to capure network trace, using tcpdump filtered on the IP address configured using the CLIENT variable, on all AKS cluster nodes.
 
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
