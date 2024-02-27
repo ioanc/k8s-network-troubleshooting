@@ -54,11 +54,11 @@ spec:
       # - image: docker.io/alpine:3.18.2
         env:
         - name: CLIENT
-          value: "62.194.70.213"     
+          value: "172.212.27.129"     
         command:
         - sh
         - -xc
-        - tdnf install -q -y tcpdump ; mkdir /tcpdump ; tcpdump -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-%M.pcap host $CLIENT
+        - date --utc ; tdnf install -q -y tcpdump ; mkdir /tcpdump ; date --utc ; tcpdump -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-%M.pcap host $CLIENT
         # - apk --update add tcpdump ; mkdir /tcpdump ; tcpdump -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-$CLIENT-%M.pcap host $CLIENT
         name: tcpdump
         lifecycle:
