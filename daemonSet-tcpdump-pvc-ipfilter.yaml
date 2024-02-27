@@ -1,9 +1,11 @@
 #
 # DaemonSet to capure network trace, using tcpdump, on all AKS cluster nodes.
-# the yaml file will create 3 resources:
+# The yaml file will create 3 resources:
 #   1) a new storage class, using the file.csi.azure.com provisioner with reclaimPolicy: Retain
-#   2) a PVC, using the above storage class
+#   2) a PVC, using the above storage class using the default storage account in the MC_ resource group of the AKS cluster
 #   3) a DaemonSet to capure network trace, using tcpdump filtered on the IP address configured using the CLIENT variable, on all AKS cluster nodes.
+#      tcpdump will rotate new files every 300 seconds and as result we will keep maximum of 60min of historical network capture at any point in time.
+# To stop and remove the daemonSet just run kubectl delete -f daemonSet-tcpdump-pvc-ipfilter.yaml; This will not remove the PVC and the files already saved.
 
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
