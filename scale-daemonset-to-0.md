@@ -1,5 +1,11 @@
+# Scale the specific DamonSet to 0
 ```shell
-kubectl patch -n kube-system daemonset ama-logs -p '{"spec": {"template": {"spec": {"nodeSelector": {"non-existing": "true"}}}}}'
+DAEMONSET="ama-logs"
+kubectl patch -n kube-system daemonset $DAEMONSET -p '{"spec": {"template": {"spec": {"nodeSelector": {"non-existing": "true"}}}}}'
+```
 
-kubectl patch -n kube-system daemonset ama-logs --type json -p='[{"op": "remove", "path": "/spec/template/spec/nodeSelector/non-existing"}]'
+# Scale the specific DamonSet back to initial replicas 
+```shell
+DAEMONSET="ama-logs"
+kubectl patch -n kube-system daemonset $DAEMONSET --type json -p='[{"op": "remove", "path": "/spec/template/spec/nodeSelector/non-existing"}]'
 ```
