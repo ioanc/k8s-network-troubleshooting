@@ -1,9 +1,9 @@
 # Description: This script will allow you to "ssh" into a node in a AKS cluster, regardless of the OS
-# Dependencies: kubectl, jq, zsh
+# Dependencies: kubectl, jq
 # Author: ioan corcodel
-# Version: 0.5.0
+# Version: 0.6.0
 # Limitations: This script is only tested on AKS clusters
-# Compatibility: This script is compatible with zsh
+# Compatibility: This script was only tested on Ubuntu 20.04 using bash and zsh
 # Usage: source ssh-node.function
 #        ssh-node <node-name>
 # Url: https://learn.microsoft.com/en-us/azure/aks/use-windows-hpc#limitations
@@ -20,85 +20,123 @@ function ssh-node(){
         echo "Windows2022"
         echo $NODE
         IMAGE='mcr.microsoft.com/windows/servercore:ltsc2022'
-        myYaml='
-        apiVersion: v1
-        kind: Pod
-        metadata:
-          labels:
-            pod: hpc
-          name: debug-node-NODE
-        spec:
-          securityContext:
-            windowsOptions:
-              hostProcess: true
-              runAsUserName: "NT AUTHORITY\\\\SYSTEM"
-          hostNetwork: true
-          containers:
-            - name: hpc
-              image: IMAGE
-              command:
-                - powershell.exe
-                - -Command
-                - "Start-Sleep 2147483"
-              imagePullPolicy: IfNotPresent
-          nodeSelector:
-            kubernetes.io/os: windows
-            kubernetes.io/hostname: NODE
-          tolerations:
-            - effect: NoSchedule
-              key: node.kubernetes.io/unschedulable
-              operator: Exists
-            - effect: NoSchedule
-              key: node.kubernetes.io/network-unavailable
-              operator: Exists
-            - effect: NoExecute
-              key: node.kubernetes.io/unreachable
-              operator: Exists
+        podjson='
+        {
+          "apiVersion": "v1",
+          "kind": "Pod",
+          "metadata": {
+            "labels": {
+              "pod": "hpc"
+            },
+            "name": "debug-node-NODE"
+          },
+          "spec": {
+            "securityContext": {
+              "windowsOptions": {
+                "hostProcess": true,
+                "runAsUserName": "NT AUTHORITYSYSTEM"
+              }
+            },
+            "hostNetwork": true,
+            "containers": [
+              {
+                "name": "hpc",
+                "image": "IMAGE",
+                "command": [
+                  "powershell.exe",
+                  "-Command",
+                  "Start-Sleep 2147483"
+                ],
+                "imagePullPolicy": "IfNotPresent"
+              }
+            ],
+            "nodeSelector": {
+              "kubernetes.io/os": "windows",
+              "kubernetes.io/hostname": "NODE"
+            },
+            "tolerations": [
+              {
+                "effect": "NoSchedule",
+                "key": "node.kubernetes.io/unschedulable",
+                "operator": "Exists"
+              },
+              {
+                "effect": "NoSchedule",
+                "key": "node.kubernetes.io/network-unavailable",
+                "operator": "Exists"
+              },
+              {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists"
+              }
+            ]
+          }
+        }
         '
-        echo $myYaml | sed -e "s|NODE|${NODE}|g" -e "s|IMAGE|${IMAGE}|g" | kubectl apply -f -
+        echo $podjson | sed -e "s|NODE|${NODE}|g" -e "s|IMAGE|${IMAGE}|g" -e 's|AUTHORITYSYSTEM|AUTHORITY\\\\SYSTEM|g' | kubectl apply -f -
         kubectl wait --for=condition=ready pod debug-node-$NODE 2>1 > /dev/null
         kubectl exec -it debug-node-$NODE -- powershell ; kubectl delete pod debug-node-$NODE
       ;;
       Windows2019)
-        echo "Windows2022"
+        echo "Windows2019"
         echo $NODE
         IMAGE='mcr.microsoft.com/windows/servercore:1809'
-        myYaml='
-        apiVersion: v1
-        kind: Pod
-        metadata:
-          labels:
-            pod: hpc
-          name: debug-node-NODE
-        spec:
-          securityContext:
-            windowsOptions:
-              hostProcess: true
-              runAsUserName: "NT AUTHORITY\\\\SYSTEM"
-          hostNetwork: true
-          containers:
-            - name: hpc
-              image: IMAGE
-              command:
-                - powershell.exe
-                - -Command
-                - "Start-Sleep 2147483"
-              imagePullPolicy: IfNotPresent
-          nodeSelector:
-            kubernetes.io/os: windows
-            kubernetes.io/hostname: NODE
-          tolerations:
-            - effect: NoSchedule
-              key: node.kubernetes.io/unschedulable
-              operator: Exists
-            - effect: NoSchedule
-              key: node.kubernetes.io/network-unavailable
-              operator: Exists
-            - effect: NoExecute
-              key: node.kubernetes.io/unreachable
-              operator: Exists
+        podjson='
+        {
+          "apiVersion": "v1",
+          "kind": "Pod",
+          "metadata": {
+            "labels": {
+              "pod": "hpc"
+            },
+            "name": "debug-node-NODE"
+          },
+          "spec": {
+            "securityContext": {
+              "windowsOptions": {
+                "hostProcess": true,
+                "runAsUserName": "NT AUTHORITYSYSTEM"
+              }
+            },
+            "hostNetwork": true,
+            "containers": [
+              {
+                "name": "hpc",
+                "image": "IMAGE",
+                "command": [
+                  "powershell.exe",
+                  "-Command",
+                  "Start-Sleep 2147483"
+                ],
+                "imagePullPolicy": "IfNotPresent"
+              }
+            ],
+            "nodeSelector": {
+              "kubernetes.io/os": "windows",
+              "kubernetes.io/hostname": "NODE"
+            },
+            "tolerations": [
+              {
+                "effect": "NoSchedule",
+                "key": "node.kubernetes.io/unschedulable",
+                "operator": "Exists"
+              },
+              {
+                "effect": "NoSchedule",
+                "key": "node.kubernetes.io/network-unavailable",
+                "operator": "Exists"
+              },
+              {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists"
+              }
+            ]
+          }
+        }
         '
-        echo $myYaml | sed -e "s|NODE|${NODE}|g" -e "s|IMAGE|${IMAGE}|g" | kubectl apply -f -
+        echo $podjson | sed -e "s|NODE|${NODE}|g" -e "s|IMAGE|${IMAGE}|g" -e 's|AUTHORITYSYSTEM|AUTHORITY\\\\SYSTEM|g' | kubectl apply -f -
         kubectl wait --for=condition=ready pod debug-node-$NODE 2>1 > /dev/null
         kubectl exec -it debug-node-$NODE -- powershell ; kubectl delete pod debug-node-$NODE
       ;;
