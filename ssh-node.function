@@ -7,6 +7,10 @@
 # Usage: source ssh-node.function
 #        ssh-node <node-name>
 # Url: https://learn.microsoft.com/en-us/azure/aks/use-windows-hpc#limitations
+#
+# With kubectl v1.30 you can use the following command to access the AKS /K8S node with full rights on Linux
+# kubectl debug node/<node-name> -it --image=<image-name> --profile=sysadmin
+# https://github.com/kubernetes/kubernetes/pull/119200
 
 function ssh-node(){
   if [ -z $1 ]; then
