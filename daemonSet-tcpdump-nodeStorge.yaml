@@ -1,7 +1,9 @@
 #
 # The DaemonSet to capure network trace, using tcpdump, on all AKS cluster nodes and write files to local node disk
-# tcpdump filter will record packet to and from SRV and specific packages - https://www.howtouselinux.com/post/tcpdump-capture-packets-with-tcp-flags
-#   SYN: tcp[13] == 2
+# tcpdump filter will record specific packet to and from SRV;
+# tcp filters: https://www.howtouselinux.com/post/tcpdump-capture-packets-with-tcp-flags 
+# tcp filters: https://danielmiessler.com/p/tcpdump/
+#   SYN: tcp[13] & 2!=0
 #   RST: tcp[13] == 4
 #   SYN, ACK: tcp[13] == 18
 #   FIN, ACK: tcp[13] == 17
@@ -35,8 +37,8 @@ spec:
         command:
         - sh
         - -xc
-        - tdnf install -y tcpdump ; tcpdump -Z root -e -ni any -s 128 -G 300 -w /tcpdump/$HOSTNAME-$SRV-%M.pcap tcp[13] == 18 or tcp[13] == 17 or tcp[13] == 2 or tcp[13] == 4 or tcp[13] == 20 and host $SRV
-        # - apk --update add tcpdump ; tcpdump -Z root -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-$SRV-%M.pcap 'tcp[13] == 18 or tcp[13] == 17 or tcp[13] == 2 or tcp[13] == 4 or tcp[13] == 20'
+        - tdnf install -y tcpdump ; tcpdump -Z root -e -ni any -s 128 -G 300 -w /tcpdump/$HOSTNAME-$SRV-%M.pcap tcp[13] == 18 or tcp[13] == 17 or (tcp[13] & 2!=0) or tcp[13] == 4 or tcp[13] == 20 and host $SRV
+        # - apk --update add tcpdump ; tcpdump -Z root -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-$SRV-%M.pcap 'tcp[13] == 18 or tcp[13] == 17 or tcp[13] & 2!=0 or tcp[13] == 4 or tcp[13] == 20'
         name: tcpdump
         lifecycle:
           preStop:
