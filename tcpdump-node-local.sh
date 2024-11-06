@@ -11,4 +11,4 @@ NODE="aks-1213-NODE_NAME"
 TIMEOUT="3600"
 # create a new file every 300 seconds;
 CHUNK="300"
-kubectl debug node/$NODE --image mcr.microsoft.com/mirror/docker/library/busybox:1.35 -- sh -xc "chroot /host timeout $TIMEOUT tcpdump -Z root -i any -s 256 -G $CHUNK -w $NODE_%I-%M.pcap host 1.2.3.4 ; sleep inf"
+kubectl debug node/$NODE --image mcr.microsoft.com/mirror/docker/library/busybox:1.35 -- sh -xc "chroot /host timeout $TIMEOUT tcpdump -Z root -i any -s 256 -G $CHUNK -w $NODE-%I-%M.pcap host 1.2.3.4 ; sleep inf"
