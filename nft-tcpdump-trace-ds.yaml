@@ -1,4 +1,4 @@
-# nft is failing on Azure Linux!
+# 'nft add chain filter' is failing on Azure Linux!
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
