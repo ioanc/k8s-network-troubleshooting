@@ -1,4 +1,5 @@
 # 'nft add chain filter' is failing on Azure Linux!
+# Adding this command first, 'nft add table filter', could mitigate the issue on Azure Linux!
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
