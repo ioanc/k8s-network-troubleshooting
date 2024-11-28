@@ -1,5 +1,13 @@
-# 'nft add chain filter' is failing on Azure Linux!
-# Adding this command first, 'nft add table filter', could mitigate the issue on Azure Linux!
+# Using tcpdump and nft for tracing packet flows on kubernetes nodes send to services of type Loadbalancer
+# Tracing only SYN packts with nft
+# nft resources:
+# https://wiki.nftables.org/wiki-nftables/index.php/Ruleset_debug/tracing
+# https://wiki.nftables.org/wiki-nftables/index.php/Matching_packet_headers
+
+# After the trace is stopped, controlled by TIMEOUT variable, you can check pod logs using the command
+# kubectl logs -n kube-system -l=app=packet-trace --tail 40
+
+
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -28,14 +36,14 @@ spec:
           value: "10.10.10.11"
         - name: TIMEOUT
           # Timeout in seconds to stop tracing automatically
-          value: "180"
+          value: "120"
         - name: CLIENT
           # Client IP sending cURL request"
           value: "10.10.1.11" 
         command:
         - /bin/sh
         - -xc
-        - nsenter --mount=/proc/1/ns/mnt -- bash -xc "timeout $TIMEOUT tcpdump -tttt -i any -nnlSv host $LB ; nft add table css-filter ; nft add chain css-filter trace_chain { type filter hook prerouting priority -301\; } ;nft add rule css-filter trace_chain ip daddr $LB tcp flags == syn meta nftrace set 1 ; timeout $TIMEOUT nft monitor trace ; nft delete table css-filter ; sleep inf"
+        - nsenter --mount=/proc/1/ns/mnt -- bash -xc "echo $HOSTNAME ; $timeout $TIMEOUT tcpdump -tttt -i any -nnlSv host $LB ; nft add table css-filter ; nft add chain css-filter trace_chain { type filter hook prerouting priority -301\; } ;nft add rule css-filter trace_chain ip daddr $LB tcp flags == syn meta nftrace set 1 ; timeout $TIMEOUT nft monitor trace ; nft delete table css-filter ; sleep inf"
         name: packet-trace
         resources:
           limits:
