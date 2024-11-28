@@ -35,7 +35,7 @@ spec:
         command:
         - /bin/sh
         - -xc
-        - nsenter --mount=/proc/1/ns/mnt -- bash -xc "timeout $TIMEOUT tcpdump -tttt -i any -nnlSv host $LB ; nft add chain filter trace_chain { type filter hook prerouting priority -301\; } ; nft add rule filter trace_chain meta nftrace set 1 ; timeout $TIMEOUT nft monitor trace | grep $LB ; nft delete chain filter trace_chain ; sleep inf"
+        - nsenter --mount=/proc/1/ns/mnt -- bash -xc "timeout $TIMEOUT tcpdump -tttt -i any -nnlSv host $LB ; nft add chain filter-css ; nft add chain filter-css trace_chain { type filter hook prerouting priority -301\; } ; nft add rule filter-css trace_chain ip daddr $LB tcp flags == syn meta nftrace set 1 ; timeout $TIMEOUT nft monitor trace | grep $LB ; nft delete chain filter trace_chain ; sleep inf"
         name: packet-trace
         resources:
           limits:
