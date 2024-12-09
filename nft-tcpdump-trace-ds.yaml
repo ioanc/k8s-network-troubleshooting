@@ -5,6 +5,7 @@
 # https://wiki.nftables.org/wiki-nftables/index.php/Matching_packet_headers
 # https://wiki.nftables.org/wiki-nftables/index.php/Netfilter_hooks
 # https://johannst.github.io/notes/network/nftables.html
+# https://github.com/eiginn/nftrace
 
 # After the trace is stopped, controlled by TIMEOUT variable, you can check pod logs using the command
 # kubectl logs -n kube-system -l=app=packet-trace --tail 40
