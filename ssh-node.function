@@ -18,12 +18,12 @@ function ssh-node(){
     return
   else
     NODE=$1
-    OS=$(kubectl get nodes $NODE -o json | jq '.metadata.labels."kubernetes.azure.com/os-sku"' | tr -d \")
+    OS=$(kubectl get node $NODE -o=jsonpath="{.metadata.labels.kubernetes\.io/os}")
     case "$OS" in
-      Windows2022)
-        echo "Windows2022"
+      windows)
+        echo "Windows"
         echo $NODE
-        IMAGE='mcr.microsoft.com/windows/servercore:ltsc2022'
+        IMAGE='mcr.microsoft.com/oss/kubernetes/windows-host-process-containers-base-image:v1.0.0'
         podjson='
         {
           "apiVersion": "v1",
@@ -60,84 +60,7 @@ function ssh-node(){
               "kubernetes.io/hostname": "NODE"
             },
             "tolerations": [
-              {
-                "effect": "NoSchedule",
-                "key": "node.kubernetes.io/unschedulable",
-                "operator": "Exists"
-              },
-              {
-                "effect": "NoSchedule",
-                "key": "node.kubernetes.io/network-unavailable",
-                "operator": "Exists"
-              },
-              {
-                "effect": "NoExecute",
-                "key": "node.kubernetes.io/unreachable",
-                "operator": "Exists"
-              }
-            ]
-          }
-        }
-        '
-        echo $podjson | sed -e "s|NODE|${NODE}|g" -e "s|IMAGE|${IMAGE}|g" -e 's|AUTHORITYSYSTEM|AUTHORITY\\\\SYSTEM|g' | kubectl apply -f -
-        kubectl wait --for=condition=ready pod debug-node-$NODE -n kube-system 2>1 > /dev/null
-        kubectl exec -it -n kube-system debug-node-$NODE -- powershell ; kubectl delete pod debug-node-$NODE -n kube-system
-      ;;
-      Windows2019)
-        echo "Windows2019"
-        echo $NODE
-        IMAGE='mcr.microsoft.com/windows/servercore:1809'
-        podjson='
-        {
-          "apiVersion": "v1",
-          "kind": "Pod",
-          "metadata": {
-            "labels": {
-              "pod": "hpc"
-            },
-            "name": "debug-node-NODE",
-            "namespace": "kube-system"
-          },
-          "spec": {
-            "securityContext": {
-              "windowsOptions": {
-                "hostProcess": true,
-                "runAsUserName": "NT AUTHORITYSYSTEM"
-              }
-            },
-            "hostNetwork": true,
-            "containers": [
-              {
-                "name": "hpc",
-                "image": "IMAGE",
-                "command": [
-                  "powershell.exe",
-                  "-Command",
-                  "Start-Sleep 2147483"
-                ],
-                "imagePullPolicy": "IfNotPresent"
-              }
-            ],
-            "nodeSelector": {
-              "kubernetes.io/os": "windows",
-              "kubernetes.io/hostname": "NODE"
-            },
-            "tolerations": [
-              {
-                "effect": "NoSchedule",
-                "key": "node.kubernetes.io/unschedulable",
-                "operator": "Exists"
-              },
-              {
-                "effect": "NoSchedule",
-                "key": "node.kubernetes.io/network-unavailable",
-                "operator": "Exists"
-              },
-              {
-                "effect": "NoExecute",
-                "key": "node.kubernetes.io/unreachable",
-                "operator": "Exists"
-              }
+              {"operator": "Exists"}
             ]
           }
         }
