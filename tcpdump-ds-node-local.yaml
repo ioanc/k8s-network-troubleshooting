@@ -1,0 +1,72 @@
+# 
+# Disclaimer: The provided YAML file is shared "as is" without any guarantees or warranties. Use it at your own risk.
+#
+# This YAML file is designed to create a DaemonSet in Kubernetes that runs tcpdump on all nodes in the cluster.
+# It captures network traffic and writes the output to files on the local node disk.
+# The tcpdump command is configured to filter specific TCP packets based on flags.
+# The captured files are named based on the hostname and timestamp.
+# The DaemonSet is set to run in the kube-system namespace and uses the mcr.microsoft.com/azurelinux/busybox image.
+# The tcpdump command is executed with root privileges and is set to run indefinitely. 
+
+# tcpdump filter will record specific packet to and from SRV;
+# tcp filters: https://www.howtouselinux.com/post/tcpdump-capture-packets-with-tcp-flags 
+# tcp filters: https://danielmiessler.com/p/tcpdump/
+#   SYN: tcp[13] & 2!=0
+#   RST: tcp[13] == 4
+#   SYN, ACK: tcp[13] == 18
+#   FIN, ACK: tcp[13] == 17
+#   RST,ACK: tcp[13] == 20
+# tcpdump will create a file every 5 minutes and after 60 minutes overwrite the first one; 
+#    this approach will ensure we will keep history for 60min, without filling up node disk
+# We can use "tar -vczf tcpdump-$HOSTNAME.tgz *.pcap" in a debug node pod to archive and compress all *.pcap files.
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: tcpdump
+  name: tcpdump
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: tcpdump
+  template:
+    metadata:
+      labels:
+        app: tcpdump
+    spec:
+      containers:
+      - image: mcr.microsoft.com/azurelinux/busybox:1.36    
+        command:
+        - sh
+        - -xc
+        - chroot /host tcpdump -Z root -e -ni any -s 128 -G 300 -w /$HOSTNAME-%M.pcap 'tcp[13] == 18 or tcp[13] == 17 or (tcp[13] & 2!=0) or tcp[13] == 4 or tcp[13] == 20'
+        name: tcpdump
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -xc
+              - sleep 10
+        volumeMounts:
+        - mountPath: /host
+          name: host-root
+          readOnly: false
+        resources:
+          limits:
+            cpu: 100m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        securityContext:
+          privileged: true
+      hostPID: true
+      hostNetwork: true
+      volumes:
+      - hostPath:
+          path: /
+          type: ""
+        name: host-root
