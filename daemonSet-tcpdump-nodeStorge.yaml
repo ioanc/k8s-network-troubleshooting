@@ -29,15 +29,18 @@ spec:
         app: tcpdump
     spec:
       containers:
-      - image: mcr.microsoft.com/cbl-mariner/base/core:2.0
-      # - image: docker.io/alpine:3.18.2
+      - image: mcr.microsoft.com/azurelinux/busybox:1.36
         env:
         - name: SRV
-          value: "10.65.15.253"     
+          value: "10.65.15.253"
+        - name: TIMEOUT
+          value: "300"
+        - name: CHUNK
+          value: "600"
         command:
         - sh
         - -xc
-        - tdnf install -y tcpdump ; tcpdump -Z root -e -ni any -s 128 -G 300 -w /tcpdump/$HOSTNAME-$SRV-%M.pcap tcp[13] == 18 or tcp[13] == 17 or (tcp[13] & 2!=0) or tcp[13] == 4 or tcp[13] == 20 and host $SRV
+        - chroot /host timeout tcpdump -Z root -e -ni any -s 128 -G 300 -w /tcpdump/$HOSTNAME-$SRV-%M.pcap tcp[13] == 18 or tcp[13] == 17 or (tcp[13] & 2!=0) or tcp[13] == 4 or tcp[13] == 20 and host $SRV
         # - apk --update add tcpdump ; tcpdump -Z root -e -ni any -s 128 -G 300 -w /root/tcpdump/$HOSTNAME-$SRV-%M.pcap 'tcp[13] == 18 or tcp[13] == 17 or tcp[13] & 2!=0 or tcp[13] == 4 or tcp[13] == 20'
         name: tcpdump
         lifecycle:
