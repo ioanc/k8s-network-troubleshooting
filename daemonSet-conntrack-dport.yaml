@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: conntrack-logs
+  name: conntrack-logs
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: conntrack-logs
+  template:
+    metadata:
+      labels:
+        app: conntrack-logs
+    spec:
+      containers:
+      - command:
+        - sh
+        - -xc
+        - chroot /host sh -c "while true; do date -u ; conntrack -L -o timestamp,extended -p TCP --dport 22 ; sleep 30 ; done"
+        image: mcr.microsoft.com/azurelinux/busybox:1.36
+        imagePullPolicy: IfNotPresent
+        name: conntrack-logs
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /host
+          name: host-root
+      enableServiceLinks: true
+      hostIPC: true
+      hostNetwork: true
+      hostPID: true
+      preemptionPolicy: PreemptLowerPriority
+      priority: 0
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - operator: Exists
+      volumes:
+      - hostPath:
+          path: /
+          type: ""
+        name: host-root
+    
