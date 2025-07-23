@@ -1,3 +1,8 @@
+# DaemonSet to log conntrack entries for TCP connections on port 22
+# This DaemonSet runs a container that continuously logs the conntrack entries every 30 seconds.
+# It uses a privileged container to access the host's conntrack entries.
+# The logs will include timestamps and extended information for each entry.
+# The container runs in the kube-system namespace and mounts the host's root filesystem.
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
