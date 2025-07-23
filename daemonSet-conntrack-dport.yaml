@@ -49,7 +49,7 @@ spec:
       nodeSelector:
         kubernetes.io/os: linux
         # replace with your node pool label if necessary
-        nodepool: mynodepool
+        agentpool: agentpool
       preemptionPolicy: PreemptLowerPriority
       priority: 0
       restartPolicy: Always
