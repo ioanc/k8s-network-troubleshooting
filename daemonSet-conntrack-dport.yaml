@@ -39,6 +39,10 @@ spec:
       preemptionPolicy: PreemptLowerPriority
       priority: 0
       restartPolicy: Always
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
       schedulerName: default-scheduler
       terminationGracePeriodSeconds: 30
       tolerations:
