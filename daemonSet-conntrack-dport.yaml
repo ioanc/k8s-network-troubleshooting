@@ -20,6 +20,9 @@ spec:
         app: conntrack-logs
     spec:
       containers:
+      # This container runs the conntrack command to log TCP connections on port 22 every 30 seconds.
+      # Replace the value for --dport if you want to monitor a different port.
+      # Replace the argument for sleep if you want to change the logging interval.
       - command:
         - sh
         - -xc
@@ -36,6 +39,10 @@ spec:
       hostIPC: true
       hostNetwork: true
       hostPID: true
+      nodeSelector:
+        kubernetes.io/os: linux
+        # replace with your node pool label if necessary
+        nodepool: mynodepool
       preemptionPolicy: PreemptLowerPriority
       priority: 0
       restartPolicy: Always
