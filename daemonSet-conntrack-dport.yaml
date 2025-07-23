@@ -30,6 +30,13 @@ spec:
         image: mcr.microsoft.com/azurelinux/busybox:1.36
         imagePullPolicy: IfNotPresent
         name: conntrack-logs
+        resources:
+          requests:
+            cpu: 100m
+            memory: 50Mi
+          limits:
+            cpu: 200m
+            memory: 100Mi
         securityContext:
           privileged: true
         volumeMounts:
@@ -46,10 +53,6 @@ spec:
       preemptionPolicy: PreemptLowerPriority
       priority: 0
       restartPolicy: Always
-      resources:
-        requests:
-          cpu: 50m
-          memory: 64Mi
       schedulerName: default-scheduler
       terminationGracePeriodSeconds: 30
       tolerations:
