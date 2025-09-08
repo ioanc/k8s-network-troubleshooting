@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
       - name: nginx-test
-        image: mcr.microsoft.com/cbl-mariner/base/nginx:1.22-cm2.0
+        image: mcr.microsoft.com/azurelinux/base/nginx:1.25
 
 # Run the following loop to test the connections between each of the pods in the DaemonSet to each other:
 
