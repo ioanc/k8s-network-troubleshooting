@@ -30,7 +30,7 @@ spec:
       #    sysctl -w net.core.tcp_pingpong_thresh=3
       #    sysctl net.core.tcp_pingpong_thresh
       #    sleep infinity
-       image: mcr.microsoft.com/cbl-mariner/base/core:2.0
+       image: mcr.microsoft.com/azurelinux/base/core:3.0
        resources:
          requests:
            cpu: 50m
