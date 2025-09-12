@@ -72,7 +72,7 @@ function ssh-node(){
       *)
         echo "Linux"
         echo $NODE
-        IMAGE='mcr.microsoft.com/mirror/docker/library/busybox:1.35'
+        IMAGE='mcr.microsoft.com/azurelinux/busybox:1.36'
           kubectl -n kube-system run debug-node-$NODE --restart=Never -it --rm --image overriden --overrides '{"spec": {"hostPID": true,"hostNetwork": true, "nodeSelector": { "kubernetes.io/hostname": "'${NODE:?}'"}, "tolerations": [{"operator": "Exists"}],"containers": [{"name": "nsenter", "image": "'${IMAGE:?}'","command": ["sh","-xc","nsenter -m -u -i -n -p -r -w -t 1 -- bash"], "stdin": true, "tty": true, "securityContext": {"privileged": true }}] } }'
       ;;
     esac
