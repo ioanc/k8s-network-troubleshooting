@@ -16,13 +16,13 @@ kubectl -n kube-system debug node/srfb2 --profile sysadmin --image mcr.microsoft
 #### Check the logs of the debug pod; Use the name from the output of the above command 
 
 ```shell
-kubectl logs -n kube-system node-debugger-srfb2-xxx
+kubectl logs -n kube-system node-debugger-srfb2-xxxxx
 ```
 
 #### Example output
 
 ```log
- k logs -n kube-system node-debugger-srfb2-xmgtp
+kubectl logs -n kube-system node-debugger-srfb2-xxxxx
 + grep -C12 kube-probe
 + pidof -s coredns
 + chroot /host timeout 60 strace -e 'trace=network,read,write' -tt -T -Y -y -s 150 -f -p 2995209
