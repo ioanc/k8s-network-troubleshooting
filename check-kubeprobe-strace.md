@@ -1,25 +1,25 @@
-#### Install kubectl v1.30 or newer
+Install kubectl v1.30 or newer
 
 ```shell
 https://kubernetes.io/docs/tasks/tools/#kubectl
 ```
 
-#### Atach strace to the specific binary name, coredns, to observe the behavior of kube-probe, on the node where the pod/container is running, e.g. srfb2
-#### strace will be terminated after 60s
-#### check the context -C8 for grep, to ensure you get the right output
+Atach strace to the specific binary name, coredns, to observe the behavior of kube-probe, on the node where the pod/container is running, e.g. srfb2
+strace will be terminated after 60s
+check the context -C8 for grep, to ensure you get the right output
 
 ```shell
 kubectl -n kube-system debug node/srfb2 --profile sysadmin --image mcr.microsoft.com/azurelinux/busybox:1.36 \
 -- sh -xc "chroot /host timeout 60 strace -e trace=network,read,write -tt -T -Y -y -s 150 -f -p \$(pidof -s coredns) 2>&1 | grep -C8 kube-probe ; sleep inf"
 ```
 
-#### Check the logs of the debug pod; Use the name from the output of the above command 
+Check the logs of the debug pod; Use the name from the output of the above command 
 
 ```shell
 kubectl logs -n kube-system node-debugger-srfb2-xxxxx
 ```
 
-#### Example output
+Example output
 
 ```log
 kubectl logs -n kube-system node-debugger-srfb2-xxxxx
