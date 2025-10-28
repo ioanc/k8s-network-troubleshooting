@@ -4,8 +4,10 @@ Install kubectl v1.30 or newer
 https://kubernetes.io/docs/tasks/tools/#kubectl
 ```
 
-Atach strace to the specific binary name, coredns, to observe the behavior of kube-probe, on the node where the pod/container is running, e.g. srfb2
+Attach strace to the specific binary name, coredns, to observe the behavior of kube-probe, on the node where the pod/container is running, e.g. srfb2
+
 strace will be terminated after 60s
+
 check the context -C8 for grep, to ensure you get the right output
 
 ```shell
