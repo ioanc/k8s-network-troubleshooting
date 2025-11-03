@@ -1,0 +1,51 @@
+# deployment with full access on the host network to capture all traffic.
+# the deployment will run in privileged mode to be able to use nsenter, tcpdump and nft commands.
+# replace $NODE_NAME with the actual node name where to run the deployment
+# replace the IP address in the PODIP environment variable with the actual pod IP address you want to trace
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nft-tcpdump-node
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nft-tcpdump-node
+  template:
+    metadata:
+      labels:
+        app: nft-tcpdump-node
+    spec:
+      tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
+        effect: "NoSchedule"
+      nodeSelector:
+        # Select the node where you want to run the deployment, replace $NODE_NAME with the actual node name
+        kubernetes.io/hostname: NODE_NAME
+      containers:
+      - name: nft-tcpdump-node
+        image: mcr.microsoft.com/mirror/docker/library/busybox:1.35
+        env:
+        - name: PODIP
+          # Pod ip address
+          value: "10.224.0.41"
+        - name: TIMEOUT
+          # Timeout in seconds to stop tracing automatically
+          value: "30"  
+        command:
+        - /bin/sh
+        - -xc
+        - nsenter --mount=/proc/1/ns/mnt -- bash -xc "echo $HOSTNAME ; timeout $TIMEOUT tcpdump -tttt -i any -nnlSv host $PODIP ; nft add table css-filter ; nft add chain css-filter trace_chain { type filter hook prerouting priority -301\; } ;nft add rule css-filter trace_chain ip daddr $PODIP tcp flags == syn meta nftrace set 1 ; timeout $TIMEOUT nft monitor trace ; nft delete table css-filter ;echo $HOSTNAME ; sleep inf"
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        securityContext:
+          privileged: true
+      hostPID: true
+      hostNetwork: true
