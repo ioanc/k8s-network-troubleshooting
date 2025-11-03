@@ -1,7 +1,0 @@
-FROM mcr.microsoft.com/cbl-mariner/base/core:2.0
-LABEL Author: ioan corcodel
-COPY start.sh /
-RUN tdnf install -q -y mariner-repos-extended ; tdnf install -q -y wireshark-cli ; tdnf remove -q -y mariner-repos-extended 
-RUN adduser -G wireshark tshark ; chgrp wireshark /usr/bin/dumpcap && chmod 4750 /usr/bin/dumpcap
-USER tshark
-CMD ["sh", "start.sh"]
