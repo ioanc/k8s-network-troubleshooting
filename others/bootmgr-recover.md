@@ -11,11 +11,15 @@ http://tinycorelinux.net/16.x/x86/release/Core-current.iso
 
 + On the tc console install tools to check ip, connect remote, mount NTFS partition
 
+```
 tce-load -wi iproute2 dropbear ntfs-3g
+```
 
 + On the tc console check ip and start dropbear
 
+```
 sudo ip addr && sudo dropbear -R -B -F -E
+```
 
 + On the tc console or from remote check ntfs partition
 
