@@ -36,7 +36,7 @@ spec:
 #     kubectl get po $pod -n kube-system --output=jsonpath='{"\n"}{.metadata.name}{" "}{..status.podIP}{" "}{.spec.nodeName}{" "}{..status.hostIP}{"\n"}';
 #     for podip in $(kubectl get -n kube-system po -A -l app=nginx-test --output=jsonpath={..status.podIP});
 #   do
-#      kubectl exec -n kube-system -it $pod -c nginx-test -- curl -s -o /dev/null $podip && echo "$pod can connect to $podip" || echo "$pod cannot connect to $podip"
+#      kubectl exec -n kube-system -it $pod -c nginx-test -- curl -m 5 -s -o /dev/null $podip && echo "$pod can connect to $podip" || echo "$pod cannot connect to $podip";
 #   done
 # done
 
