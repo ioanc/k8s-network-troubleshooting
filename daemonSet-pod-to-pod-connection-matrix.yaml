@@ -31,7 +31,7 @@ spec:
 
 # Run the following loop to test the connections between each of the pods in the DaemonSet to each other:
 
-`shell
+`
 for pod in $(kubectl get pod -n kube-system -l app=nginx-test --output=jsonpath={.items..metadata.name});
 do
     kubectl get po $pod -n kube-system --output=jsonpath='{"\n"}{.metadata.name}{" "}{..status.podIP}{" "}{.spec.nodeName}{" "}{..status.hostIP}{"\n"}';
