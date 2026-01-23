@@ -65,7 +65,8 @@ function ssh-node(){
           }
         }
         '
-        echo $podjson | sed -e "s|NODE|${NODE}|g" -e "s|IMAGE|${IMAGE}|g" -e 's|AUTHORITYSYSTEM|AUTHORITY\\\\SYSTEM|g' | kubectl apply -f -
+        kubectl delete pod -n kube-system debug-node-$NODE --ignore-not-found
+	echo $podjson | sed -e "s|NODE|${NODE}|g" -e "s|IMAGE|${IMAGE}|g" -e 's|AUTHORITYSYSTEM|AUTHORITY\\\\SYSTEM|g' | kubectl apply -f -
         kubectl wait --for=condition=ready pod debug-node-$NODE -n kube-system 2>1 > /dev/null
         kubectl exec -it -n kube-system debug-node-$NODE -- powershell ; kubectl delete pod debug-node-$NODE -n kube-system
       ;;
@@ -73,7 +74,8 @@ function ssh-node(){
         echo "Linux"
         echo $NODE
         IMAGE='mcr.microsoft.com/mirror/docker/library/busybox:1.35'
-          kubectl -n kube-system run debug-node-$NODE --restart=Never -it --rm --image overriden --overrides '{"spec": {"hostPID": true,"hostNetwork": true, "nodeSelector": { "kubernetes.io/hostname": "'${NODE:?}'"}, "tolerations": [{"operator": "Exists"}],"containers": [{"name": "nsenter", "image": "'${IMAGE:?}'","command": ["sh","-xc","nsenter -m -u -i -n -p -r -w -t 1 -- bash"], "stdin": true, "tty": true, "securityContext": {"privileged": true }}] } }'
+	kubectl delete pod -n kube-system debug-node-$NODE --ignore-not-found
+        kubectl -n kube-system run debug-node-$NODE --restart=Never -it --rm --image overriden --overrides '{"spec": {"hostPID": true,"hostNetwork": true, "nodeSelector": { "kubernetes.io/hostname": "'${NODE:?}'"}, "tolerations": [{"operator": "Exists"}],"containers": [{"name": "nsenter", "image": "'${IMAGE:?}'","command": ["sh","-xc","nsenter -m -u -i -n -p -r -w -t 1 -- bash"], "stdin": true, "tty": true, "securityContext": {"privileged": true }}] } }'
       ;;
     esac
   fi
