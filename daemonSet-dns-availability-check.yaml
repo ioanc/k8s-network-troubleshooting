@@ -1,0 +1,49 @@
+# Disclaimer: 
+# The provided YAML file is shared "as is" without any guarantees or warranties. Use it at your own risk.
+# # This is an example and is provided as-is. Review and validate before deploying.
+# This DaemonSet tests DNS resolution latency for mcr.microsoft.com against 3 DNS servers.
+# Update the DNS server IPs on line 29 (DNS_SERVERS) to customise for your specific usage.
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: dns-availability-check
+  labels:
+    app: dns-check
+spec:
+  selector:
+    matchLabels:
+      app: dns-check
+  template:
+    metadata:
+      labels:
+        app: dns-check
+    spec:
+      containers:
+      - name: dns-check
+        image: mcr.microsoft.com/azurelinux/base/core:3.0
+        command:
+        - /bin/sh
+        - -c
+        - |
+          curl -o /etc/yum.repos.d/azurelinux-prod-base.repo -L https://packages.microsoft.com/azurelinux/3.0/prod/base/x86_64/config.repo
+          tdnf update -y
+          tdnf install bind-utils gawk -y --nogpgcheck
+          echo "Starting DNS availability check..."
+          DNS_SERVERS="10.121.131.13 10.121.131.14 10.121.131.15"
+          while true; do
+            for dns in $DNS_SERVERS; do
+              output=$(dig +stats +timeout=4 +tries=2 mcr.microsoft.com @"$dns" 2>&1)
+              query_time=$(echo "$output" | grep "Query time" | awk '{print $4}')
+              if [ -z "$query_time" ] || echo "$output" | grep -qi "timed out\|no servers\|connection refused"; then
+                echo "$(date '+%Y-%m-%d %H:%M') TIMEOUT dns=$dns query_time=4000msec"
+              elif [ "$query_time" -gt 2700 ]; then
+                echo "$(date '+%Y-%m-%d %H:%M') SLOW dns=$dns query_time=${query_time}msec"
+              fi
+            done
+            sleep 45
+          done
+        resources:
+          requests:
+            cpu: 50m
+            memory: 32Mi
+      restartPolicy: Always
