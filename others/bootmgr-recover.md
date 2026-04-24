@@ -47,27 +47,11 @@ textcons
 
 To exit the text console: **ESC (`** (Escape followed by `(`)
 
-+ On the TinyCore console, run the same steps as Method 2 (install tools, mount, restore, reboot)
-
-+ After reboot, restore disk as primary boot device:
-
-```
-set /system1/bootconfig1/bootsource3 bootorder=1
-```
-
 ---
 
-### Method 2: iLO Web UI Console
+### TinyCore Console Steps
 
-+ Attach ISO to iLO Virtual Media via the web UI
-
-```
-http://tinycorelinux.net/16.x/x86/release/Core-current.iso
-```
-
-+ Restart server, press **F11** and select boot from CD-ROM
-
-+ On the TinyCore console, install tools:
++ Install tools:
 
 ```
 tce-load -wi iproute2 dropbear ntfs-3g
@@ -103,8 +87,28 @@ cp /mnt/sda1/bootmgr-ok /mnt/sda1/bootmgr
 sudo umount /mnt/sda1
 ```
 
++ **Before rebooting**, restore disk as primary boot device (via iLO SSH):
+
+```
+set /system1/bootconfig1/bootsource3 bootorder=1
+```
+
 + Restart server:
 
 ```
 sudo reboot
 ```
+
+---
+
+### Method 2: iLO Web UI Console
+
++ Attach ISO to iLO Virtual Media via the web UI
+
+```
+http://tinycorelinux.net/16.x/x86/release/Core-current.iso
+```
+
++ Restart server, press **F11** and select boot from CD-ROM
+
++ Run the TinyCore Console Steps above
