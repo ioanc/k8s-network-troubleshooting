@@ -1,6 +1,63 @@
 ## Recover bootmgr via iLO
 
-### Method 1: iLO Web UI Console
+### Method 1: iLO SSH Console (iLO 3)
+
+iLO 3 only supports legacy SSH algorithms, connect with:
+
+```
+ssh -oKexAlgorithms=+diffie-hellman-group14-sha1 -oHostKeyAlgorithms=+ssh-dss Administrator@<ilo-ip>
+```
+
++ Attach ISO via iLO CLI:
+
+```
+vm cdrom insert http://tinycorelinux.net/16.x/x86/release/Core-current.iso
+vm cdrom set connect
+```
+
++ Boot source mapping on iLO 3:
+
+```
+bootsource1 = BootFmCd
+bootsource2 = BootFmFloppy
+bootsource3 = BootFmDisk
+bootsource4 = BootFmUSBKey
+bootsource5 = BootFmNetwork
+```
+
++ Set boot device first and reset:
+
+CD-ROM:
+```
+set /system1/bootconfig1/bootsource1 bootorder=1
+reset /system1
+```
+
+USB:
+```
+set /system1/bootconfig1/bootsource4 bootorder=1
+reset /system1
+```
+
++ Attach to the text console:
+
+```
+textcons
+```
+
+To exit the text console: **ESC (`** (Escape followed by `(`)
+
++ On the TinyCore console, run the same steps as Method 2 (install tools, mount, restore, reboot)
+
++ After reboot, restore disk as primary boot device:
+
+```
+set /system1/bootconfig1/bootsource3 bootorder=1
+```
+
+---
+
+### Method 2: iLO Web UI Console
 
 + Attach ISO to iLO Virtual Media via the web UI
 
@@ -50,61 +107,4 @@ sudo umount /mnt/sda1
 
 ```
 sudo reboot
-```
-
----
-
-### Method 2: iLO SSH Console (iLO 3)
-
-iLO 3 only supports legacy SSH algorithms, connect with:
-
-```
-ssh -oKexAlgorithms=+diffie-hellman-group14-sha1 -oHostKeyAlgorithms=+ssh-dss Administrator@<ilo-ip>
-```
-
-+ Attach ISO via iLO CLI:
-
-```
-vm cdrom insert http://tinycorelinux.net/16.x/x86/release/Core-current.iso
-vm cdrom set connect
-```
-
-+ Boot source mapping on iLO 3:
-
-```
-bootsource1 = BootFmCd
-bootsource2 = BootFmFloppy
-bootsource3 = BootFmDisk
-bootsource4 = BootFmUSBKey
-bootsource5 = BootFmNetwork
-```
-
-+ Set boot device first and reset:
-
-CD-ROM:
-```
-set /system1/bootconfig1/bootsource1 bootorder=1
-reset /system1
-```
-
-USB:
-```
-set /system1/bootconfig1/bootsource4 bootorder=1
-reset /system1
-```
-
-+ Attach to the text console:
-
-```
-textcons
-```
-
-To exit the text console: **ESC (`** (Escape followed by `(`)
-
-+ On the TinyCore console, run the same steps as Method 1 (install tools, mount, restore, reboot)
-
-+ After reboot, restore disk as primary boot device:
-
-```
-set /system1/bootconfig1/bootsource3 bootorder=1
 ```
