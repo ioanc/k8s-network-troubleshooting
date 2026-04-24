@@ -87,13 +87,13 @@ cp /mnt/sda1/bootmgr-ok /mnt/sda1/bootmgr
 sudo umount /mnt/sda1
 ```
 
-+ **Before rebooting**, restore disk as primary boot device (via iLO SSH):
++ **Before rebooting**, exit the text console (**ESC (`**), then restore disk as primary boot device in the iLO CLI:
 
 ```
 set /system1/bootconfig1/bootsource3 bootorder=1
 ```
 
-+ Restart server:
++ Re-attach to the text console and restart the server:
 
 ```
 sudo reboot
