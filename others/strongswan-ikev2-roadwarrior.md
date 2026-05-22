@@ -1,4 +1,4 @@
-# strongSwan 5.9 IKEv2 Road Warrior — Ubuntu 24.04 + Windows 11
+# strongSwan 5.9 IKEv2 Road Warrior — Ubuntu 24.04 + Windows 11 / Windows 10
 
 **Scenario:** VPN server with public IP and DNS name. Road warrior (Bob) on Windows 11
 authenticates with username/password (EAP-MSCHAPv2). Test environment.
