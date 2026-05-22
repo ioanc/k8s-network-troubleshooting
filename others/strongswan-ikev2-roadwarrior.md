@@ -80,7 +80,8 @@ connections {
       }
     }
     version = 2
-    proposals = aes256-sha256-modp2048, aes128-sha256-modp2048
+    # MODP_2048 first (Windows 11), MODP_1024 fallback (Windows 10)
+    proposals = aes256-sha256-modp2048, aes128-sha256-modp2048, aes256-sha256-modp1024, aes256-sha1-modp1024
   }
 }
 
@@ -104,6 +105,9 @@ secrets {
   for ESP and will fail to establish the CHILD_SA without it.
 - `rekey_time = 0` prevents disconnect issues when the client is behind NAT.
 - `eap-dynamic` allows Windows to negotiate MSCHAPv2 via EAP-NAK.
+- `proposals` lists MODP_2048 first (Windows 11 picks it) with MODP_1024 as fallback —
+  Windows 10 ignores the `NegotiateDH2048_AES256` registry key on some builds and only offers MODP_1024.
+- MODP_1024 is cryptographically weak — acceptable for a test lab, remove for production.
 
 ---
 
@@ -262,6 +266,8 @@ Open `ike.pcap` in Wireshark — it decodes IKEv2 exchanges and shows exact prop
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | "Invalid payload received" on Windows | ESP proposal mismatch | Add `aes256-sha1`, `aes128-sha1` to `esp_proposals` |
+| "Policy match error" on Windows 10 | IKE DH group mismatch — Win10 offers MODP_1024 only | Add `aes256-sha256-modp1024`, `aes256-sha1-modp1024` to `proposals` |
+| Windows 10 still sends MODP_1024 after registry key | `NegotiateDH2048_AES256` key not effective on all Win10 builds | Add MODP_1024 proposals on the server side |
 | Auth fails, cert not trusted | CA installed in wrong store | Reinstall in **Local Machine** > Trusted Root CAs |
 | Connection drops behind NAT | Server-initiated rekeying | Set `rekey_time = 0` on children |
 | `no virtual IP found for %any6` | No IPv6 pool configured | Harmless if IPv6 not needed; add IPv6 pool to silence it |
